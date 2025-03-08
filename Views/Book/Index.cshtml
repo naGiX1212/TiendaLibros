@@ -1,0 +1,32 @@
+﻿@{
+
+    ViewData["Title"] = "Home Page";
+}
+
+@model IEnumerable<TiendaLibros.Models.ViewModels.GetBook>
+
+
+<div class="row justify-content-center">
+    <!-- Añadí justify-content-center -->
+    
+    @foreach (var product in Model)
+    {
+        <div class="col-12 col-md-6 col-lg-4 mt-3">
+            <!-- Cambié col-auto -->
+            <div class="card text-white bg-primary">
+                <a asp-action="Details" asp-route-id="@product.Id">
+                    <img class="card-img-top img-fluid mx-auto d-block"
+                         src="data:image/jpeg;base64,@product.CoverImage"
+                         style="height: 450px; object-fit: cover;" />
+                </a>
+                <form asp-controller="Book" asp-action="Delete" asp-route-id="@product.Id" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn-sm position-absolute top-0 end-0">X</button>
+                </form>
+                <div class="card-body" style="height:3rem">
+                    <h5 class="card-title text-center" style="font-size:1rem">@product.Title.ToLower()</h5>
+                </div>
+            </div>
+        </div>
+    }
+</div>
