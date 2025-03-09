@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
@@ -52,6 +53,7 @@ namespace TiendaLibros.Controllers
             return View(booksVM);
         }
 
+        [Authorize]
 
         public IActionResult CreateBook()
         {
@@ -64,6 +66,7 @@ namespace TiendaLibros.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public IActionResult CreateBook(CreateBookViewModel bookVM, IFormFile img)
         {
 
@@ -124,6 +127,7 @@ namespace TiendaLibros.Controllers
             return View(bookVM);
         }
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(Guid id)
         {

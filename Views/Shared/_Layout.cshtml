@@ -32,7 +32,22 @@
 
                         <li class="nav-item">
                             <a class="nav-link " asp-area="" asp-controller="Book" asp-action="Categories">Categorias</a>
+                            
                         </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item d-flex align-items-center">
+                                <span class="navbar-text text-white me-3">@User.Identity.Name</span>
+                                <form asp-action="LogOut" asp-controller="Account" method="post">
+                                    <button class="btn btn-danger btn-sm" type="submit">Salir</button>
+                                </form>
+                            </li>
+                        }
+                        else{
+                            <li class="nav-item">
+                                <a class="nav-link " asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

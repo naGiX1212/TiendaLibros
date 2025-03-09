@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TiendaLibros.Data;
 using TiendaLibros.Data.UnitOfWork;
@@ -10,7 +11,17 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<TiendaLibrosContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(o => o.SignIn.RequireConfirmedAccount = false)
+    .AddEntityFrameworkStores<TiendaLibrosContext>()
+    .AddDefaultTokenProviders();
 
+builder.Services.Configure<IdentityOptions>(o =>
+{
+    o.Password.RequireDigit = true;
+    o.Password.RequiredLength = 8;
+    o.Password.RequireNonAlphanumeric = false;
+
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,7 +36,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapStaticAssets();
 
