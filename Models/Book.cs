@@ -19,6 +19,8 @@ namespace TiendaLibros.Models
         public string ISBN { get; set; } = string.Empty;
         [Required]
         public byte[]? CoverImage { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime CreatedTime { get; set; } = DateTime.Now;
 
     }
 }

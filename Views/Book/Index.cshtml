@@ -3,16 +3,14 @@
     ViewData["Title"] = "Home Page";
 }
 
-@model IEnumerable<TiendaLibros.Models.ViewModels.GetBook>
+@model TiendaLibros.Models.PagedList<TiendaLibros.Models.ViewModels.GetBook>
 
 
 <div class="row justify-content-center">
-    <!-- Añadí justify-content-center -->
     
-    @foreach (var product in Model)
+    @foreach (var product in Model.Items)
     {
         <div class="col-12 col-md-6 col-lg-4 mt-3">
-            <!-- Cambié col-auto -->
             <div class="card text-white bg-primary">
                 <a asp-action="Details" asp-route-id="@product.Id">
                     <img class="card-img-top img-fluid mx-auto d-block"
@@ -29,4 +27,27 @@
             </div>
         </div>
     }
+  
 </div>
+<nav>
+    <ul class="pagination">
+        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link text-black" asp-action="Index" asp-route-pageNumber="@(Model.PageIndex - 1)" tabindex="-1" aria-disabled="@(Model.HasPreviousPage ? "false" : "true")">
+                Anterior
+            </a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+            <a class="page-link text-black" asp-action="Index" asp-route-pageNumber="@(Model.PageIndex + 1)" tabindex="-1" aria-disabled="@(Model.HasNextPage ? "false" : "true")">
+                Siguiente
+            </a>
+        </li>
+    </ul>
+</nav>

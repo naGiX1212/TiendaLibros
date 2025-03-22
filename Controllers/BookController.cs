@@ -27,9 +27,9 @@ namespace TiendaLibros.Controllers
 
         }
 
-        public IActionResult Index()
+        public  IActionResult Index(int pageNumber = 1, int pageSize = 3)
         {
-            var books = _unitOfWork.Books.GetAll().ToList();
+            var books =  _unitOfWork.Books.GetAll().OrderBy(o => o.CreatedTime).ToList();
             var cat = _unitOfWork.BookCategories.GetAllWithIncludes(o => o.Category).ToList();
             var booksVM = new List<GetBook>();
             foreach (var book in books)
@@ -46,11 +46,14 @@ namespace TiendaLibros.Controllers
                        cat.Where(o => o.BookId == book.Id).Select(o => new CategoryViewModel {Name = o.Category.Name }).FirstOrDefault()
                     },
 
-                    CoverImage = _imageService.ToBase64(book.CoverImage)
+                    CoverImage = _imageService.ToBase64(book.CoverImage),
+
+
                 });
             }
-               ;
-            return View(booksVM);
+            var pagedList = PagedList<GetBook>.Create(booksVM,pageNumber,pageSize);
+            
+            return View(pagedList);
         }
 
         [Authorize]

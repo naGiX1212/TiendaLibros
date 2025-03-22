@@ -12,10 +12,8 @@ using TiendaLibros.Data;
 namespace TiendaLibros.Migrations
 {
     [DbContext(typeof(TiendaLibrosContext))]
-    [Migration("20250309015536_identity")]
-#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
-    partial class identity
-#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
+    [Migration("20250309053438_timeData")]
+    partial class timeData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,6 +236,9 @@ namespace TiendaLibros.Migrations
                     b.Property<byte[]>("CoverImage")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
