@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
@@ -18,41 +19,29 @@ namespace TiendaLibros.Controllers
     public class BookController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
         private readonly IImageService _imageService;
-        public BookController(IUnitOfWork unitOfWork,IImageService imageService)
+        public BookController(IUnitOfWork unitOfWork,IImageService imageService,IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _imageService = imageService;
+            _mapper = mapper;
 
         }
 
         public  IActionResult Index(int pageNumber = 1, int pageSize = 3)
         {
-            var books =  _unitOfWork.Books.GetAll().OrderBy(o => o.CreatedTime).ToList();
-            var cat = _unitOfWork.BookCategories.GetAllWithIncludes(o => o.Category).ToList();
-            var booksVM = new List<GetBook>();
-            foreach (var book in books)
+            var books = _unitOfWork.Books.GetAll().OrderBy(o => o.CreatedTime).ToList();
+            var bookCategories = _unitOfWork.BookCategories.GetAllWithIncludes(o => o.Category).ToList();
+
+            var booksVM = _mapper.Map<List<GetBook>>(books, opt =>
             {
-                booksVM.Add(new GetBook
-                {
-                    Id = book.Id,
-                    Title = book.Title,
-                    Author = book.Author,
-                    Description = book.Description,
-                    ISBN = book.ISBN,
-                    Categories = new List<CategoryViewModel>()
-                    {
-                       cat.Where(o => o.BookId == book.Id).Select(o => new CategoryViewModel {Name = o.Category.Name }).FirstOrDefault()
-                    },
+                opt.Items["BookCategories"] = bookCategories;
+                opt.Items["ImageService"] = _imageService;
+            });
 
-                    CoverImage = _imageService.ToBase64(book.CoverImage),
-
-
-                });
-            }
-            var pagedList = PagedList<GetBook>.Create(booksVM,pageNumber,pageSize);
-            
+            var pagedList = PagedList<GetBook>.Create(booksVM, pageNumber, pageSize);
             return View(pagedList);
         }
 
@@ -75,13 +64,7 @@ namespace TiendaLibros.Controllers
 
             if (ModelState.IsValid)
             {
-                var book = new Book
-                {
-                    Title = bookVM.Title,
-                    Author = bookVM.Author,
-                    Description = bookVM.Description,
-                    ISBN = bookVM.ISBN
-                };
+                var book = _mapper.Map<Book>(bookVM);
                 if (img != null)
                 {
                     using (var ms = new MemoryStream())
@@ -148,19 +131,12 @@ namespace TiendaLibros.Controllers
             var book = _unitOfWork.Books.GetById(id);
             if (book != null)
             {
-                var cat = _unitOfWork.BookCategories.GetAllWithIncludes(o => o.Category).ToList();
-                var booksVM = new GetBook()
+                var bookCategorie = _unitOfWork.BookCategories.GetAllWithIncludes(o => o.Category).ToList();
+                var booksVM = _mapper.Map<GetBook>(book, opt =>
                 {
-                    Id = book.Id,
-                    Title = book.Title,
-                    Author = book.Author,
-                    Description = book.Description,
-                    ISBN = book.ISBN,
-                    Categories = cat.Where(o => o.BookId == book.Id)
-                                    .Select(o => new CategoryViewModel { Name = o.Category.Name })
-                                    .ToList(),
-                    CoverImage = _imageService.ToBase64(book.CoverImage)
-                };
+                    opt.Items["BookCategories"] = bookCategorie;
+                    opt.Items["ImageService"] = _imageService;
+                });
 
                 return View(booksVM);
             }

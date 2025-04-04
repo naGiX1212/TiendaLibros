@@ -25,7 +25,7 @@ namespace TiendaLibros.Data.Repository
         }
         public IEnumerable<T> GetAllWithIncludes(params Expression<Func<T, object>>[] includes)
         {
-            IQueryable<T> query = data;
+            IQueryable<T> query = data; 
 
             foreach (var include in includes)
             {
